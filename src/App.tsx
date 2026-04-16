@@ -1149,6 +1149,8 @@ AI 方向        ${formData.aiDirection.join(', ')}
 
   // 提交数据到 Google Sheets
   const submitToGoogleSheets = async () => {
+    console.log('🚀 开始提交数据到 Google Sheets...')
+    
     // 准备提交的数据
     const rowData = [
       new Date().toLocaleString('zh-CN'),
@@ -1170,37 +1172,56 @@ AI 方向        ${formData.aiDirection.join(', ')}
       formData.templateId,
     ]
     
+    console.log('📊 准备提交的数据:', rowData)
+    
     // Google Apps Script Web App URL
     const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzQ4QkBdTVHV-m21fnFGXeK3_3uk8F96ZUPSBbnxFgp-kdfQh9hVn-NtoD8I6xBcvxF/exec'
     
-    // 使用 FormData 方式提交（更兼容移动端）
-    const formData2 = new FormData()
-    formData2.append('data', JSON.stringify(rowData))
-    
+    // 方案1：使用 URL 参数（GET 请求 - 最兼容）
     try {
-      // 使用 fetch 不带 no-cors，让 Google Script 处理 CORS
-      const response = await fetch(WEB_APP_URL, {
-        method: 'POST',
-        body: formData2,
-        redirect: 'follow'
-      })
+      console.log('📡 尝试 GET 方式提交...')
+      const params = new URLSearchParams()
+      params.append('data', JSON.stringify(rowData))
       
-      console.log('✅ Google Sheets 请求已发送，状态:', response.status)
+      const getUrl = `${WEB_APP_URL}?${params.toString()}`
+      console.log('🔗 请求 URL 长度:', getUrl.length)
+      
+      // 创建隐藏的 iframe 来发送请求（绕过 CORS）
+      const iframe = document.createElement('iframe')
+      iframe.style.display = 'none'
+      iframe.src = getUrl
+      document.body.appendChild(iframe)
+      
+      // 等待 2 秒后移除 iframe
+      setTimeout(() => {
+        if (iframe.parentNode) {
+          document.body.removeChild(iframe)
+        }
+      }, 2000)
+      
+      console.log('✅ 请求已发送（iframe 方式）')
       return true
+      
     } catch (error) {
-      console.error('❌ 提交失败:', error)
-      // 尝试降级方案：使用 GET 参数
+      console.error('❌ iframe 方式失败:', error)
+      
+      // 方案2：使用 FormData POST（备用）
       try {
-        const params = new URLSearchParams({ data: JSON.stringify(rowData) })
-        await fetch(`${WEB_APP_URL}?${params.toString()}`, {
-          method: 'GET',
+        console.log('📡 尝试 FormData POST 方式...')
+        const formData2 = new FormData()
+        formData2.append('data', JSON.stringify(rowData))
+        
+        await fetch(WEB_APP_URL, {
+          method: 'POST',
+          body: formData2,
           mode: 'no-cors'
         })
-        console.log('✅ 使用 GET 方式提交成功')
+        
+        console.log('✅ FormData POST 请求已发送')
         return true
-      } catch (getError) {
-        console.error('❌ GET 方式也失败:', getError)
-        throw getError
+      } catch (postError) {
+        console.error('❌ FormData POST 也失败:', postError)
+        throw postError
       }
     }
   }
