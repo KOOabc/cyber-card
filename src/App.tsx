@@ -1001,7 +1001,7 @@ ${businessIntro ? `业务介绍：${businessIntro}` : ''}
   const sendEmail = async () => {
     // 🔧 EmailJS 配置
     const EMAILJS_SERVICE_ID = 'service_tftqemj'
-    const EMAILJS_TEMPLATE_ID = 'template_e5usdvi'
+    const EMAILJS_TEMPLATE_ID = 'template_yhsdgst'  // 更新为新的模板 ID
     const EMAILJS_PUBLIC_KEY = '86WCUvA3DgipnKdN3'
 
     try {
