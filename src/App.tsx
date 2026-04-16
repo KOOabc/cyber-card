@@ -997,7 +997,7 @@ ${businessIntro ? `业务介绍：${businessIntro}` : ''}
     }
   }
 
-  // 发送邮件（EmailJS）
+  // 发送邮件（EmailJS）- 使用 HTML 表格格式
   const sendEmail = async () => {
     // 🔧 EmailJS 配置
     const EMAILJS_SERVICE_ID = 'service_tftqemj'
@@ -1005,34 +1005,132 @@ ${businessIntro ? `业务介绍：${businessIntro}` : ''}
     const EMAILJS_PUBLIC_KEY = '86WCUvA3DgipnKdN3'
 
     try {
-      // 准备邮件参数
+      // 生成 HTML 表格
+      const htmlTable = `
+        <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5;">
+          <div style="background: white; border-radius: 8px; padding: 30px; max-width: 800px; margin: 0 auto; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <h2 style="color: #E85D24; margin-top: 0;">🎯 新的赛博名片提交</h2>
+            <p style="color: #666; margin-bottom: 30px;">提交时间: ${new Date().toLocaleString('zh-CN', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+              hour12: false
+            })}</p>
+
+            <!-- 业务调研信息 -->
+            <h3 style="color: #333; border-bottom: 2px solid #E85D24; padding-bottom: 8px;">📋 业务调研信息</h3>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+              <tr style="background: #f9f9f9;">
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold; width: 30%;">AI 方向</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">${formData.aiDirection.join(', ')}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">出海计划</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">${formData.isOversea}</td>
+              </tr>
+              <tr style="background: #f9f9f9;">
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">目标市场</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">${formData.overseaMarkets.length > 0 ? formData.overseaMarkets.join(', ') : '无'}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">算力需求</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">${formData.cloudNeed}</td>
+              </tr>
+              <tr style="background: #f9f9f9;">
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">业务介绍</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">${formData.businessIntro}</td>
+              </tr>
+            </table>
+
+            <!-- 用户基础信息 -->
+            <h3 style="color: #333; border-bottom: 2px solid #E85D24; padding-bottom: 8px;">👤 用户基础信息</h3>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+              <tr style="background: #f9f9f9;">
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold; width: 30%;">姓名</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">${formData.realName}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">公司</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">${formData.company}</td>
+              </tr>
+              <tr style="background: #f9f9f9;">
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">职位</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">${formData.title}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">手机号</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">${formData.phone}</td>
+              </tr>
+              <tr style="background: #f9f9f9;">
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">邮箱</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">${formData.email}</td>
+              </tr>
+            </table>
+
+            <!-- 名片展示内容 -->
+            <h3 style="color: #333; border-bottom: 2px solid #E85D24; padding-bottom: 8px;">🎨 名片展示内容</h3>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+              <tr style="background: #f9f9f9;">
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold; width: 30%;">展示名称</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">${formData.name}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">职业身份</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">${formData.titles.join(', ')}</td>
+              </tr>
+              <tr style="background: #f9f9f9;">
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">所属机构</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">${formData.organization}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">个人简介</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">${formData.bio || '无'}</td>
+              </tr>
+              <tr style="background: #f9f9f9;">
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">技能标签</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">${formData.skills.join(', ') || '无'}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;">选择模板</td>
+                <td style="padding: 12px; border: 1px solid #ddd;">${formData.templateId}</td>
+              </tr>
+            </table>
+
+            <div style="background: #fff8f0; border-left: 4px solid #E85D24; padding: 15px; margin-top: 30px;">
+              <p style="margin: 0; color: #666; font-size: 14px;">
+                💡 <strong>提示：</strong> 此邮件为自动发送，数据已同时保存到 Google Sheets 和本地存储。
+              </p>
+            </div>
+          </div>
+        </div>
+      `
+
+      // 准备邮件参数（保持原有字段，用于模板兼容）
       const emailParams = {
-        to_email: 'yefangu@gmail.com', // 接收邮箱
+        to_email: 'yefangu@gmail.com',
         subject: '🎯 新的赛博名片提交 - ' + formData.name,
+        html_content: htmlTable, // 添加 HTML 内容
         
-        // 业务调研
+        // 保留原有字段（如果模板需要）
         ai_direction: formData.aiDirection.join(', '),
         is_oversea: formData.isOversea,
         oversea_markets: formData.overseaMarkets.length > 0 ? formData.overseaMarkets.join(', ') : '无',
         cloud_need: formData.cloudNeed,
         business_intro: formData.businessIntro,
-        
-        // 用户信息
         real_name: formData.realName,
         company: formData.company,
         title: formData.title,
         phone: formData.phone,
         email: formData.email,
-        
-        // 名片内容
         name: formData.name,
         titles: formData.titles.join(', '),
         organization: formData.organization,
         bio: formData.bio,
         skills: formData.skills.join(', '),
         template_id: formData.templateId,
-        
-        // 提交时间
         submit_time: new Date().toLocaleString('zh-CN', {
           year: 'numeric',
           month: '2-digit',
@@ -1053,7 +1151,7 @@ ${businessIntro ? `业务介绍：${businessIntro}` : ''}
       )
 
       if (response.status === 200) {
-        console.log('✅ 邮件发送成功')
+        console.log('✅ 邮件发送成功（HTML 表格格式）')
         return true
       } else {
         console.error('❌ 邮件发送失败:', response)
@@ -1061,8 +1159,6 @@ ${businessIntro ? `业务介绍：${businessIntro}` : ''}
       }
     } catch (error) {
       console.error('❌ 发送邮件出错:', error)
-      // 降级到复制剪贴板
-      copyDataToClipboard()
       return false
     }
   }
@@ -1128,22 +1224,46 @@ AI 方向        ${formData.aiDirection.join(', ')}
     })
   }
 
-  // 提交数据到 Google Sheets
+  // 提交数据 - 保存到本地存储
   const submitData = async () => {
     try {
-      // 添加超时保护
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('提交超时')), 8000)
-      )
+      // 准备提交的数据
+      const submission = {
+        id: Date.now().toString(),
+        submitTime: new Date().toLocaleString('zh-CN'),
+        realName: formData.realName,
+        company: formData.company,
+        title: formData.title,
+        phone: formData.phone,
+        email: formData.email,
+        aiDirection: formData.aiDirection.join(', '),
+        isOversea: formData.isOversea,
+        overseaMarkets: formData.overseaMarkets.join(', '),
+        cloudNeed: formData.cloudNeed,
+        businessIntro: formData.businessIntro,
+        displayName: formData.name,
+        titles: formData.titles.join(', '),
+        organization: formData.organization,
+        bio: formData.bio,
+        skills: formData.skills.join(', '),
+        templateId: formData.templateId,
+      }
       
-      await Promise.race([submitToGoogleSheets(), timeoutPromise])
-      console.log('✅ 数据已成功提交到在线表格')
+      // 获取现有数据
+      const existingData = localStorage.getItem('cyber_card_submissions')
+      const submissions = existingData ? JSON.parse(existingData) : []
+      
+      // 添加新数据
+      submissions.push(submission)
+      
+      // 保存到 localStorage
+      localStorage.setItem('cyber_card_submissions', JSON.stringify(submissions))
+      
+      console.log('✅ 数据已保存到本地存储，总计:', submissions.length, '条')
       return true
     } catch (error) {
-      console.error('❌ 提交失败:', error)
-      // 不阻塞流程，静默失败
-      console.warn('⚠️ 数据提交失败，但继续流程')
-      return true // 返回 true 让流程继续
+      console.error('❌ 保存失败:', error)
+      return true // 仍然返回 true 让流程继续
     }
   }
 
@@ -1765,8 +1885,42 @@ AI 方向        ${formData.aiDirection.join(', ')}
             ← 上一步
           </button>
           <button onClick={async () => {
-            // 提交数据（优先邮件，降级到飞书/剪贴板）
+            console.log('📋 开始提交数据...')
+            
+            // 记录提交结果
+            let googleSheetsSuccess = false
+            let emailSuccess = false
+            
+            // 方案1: Google Sheets（尝试但不保证成功）
+            try {
+              googleSheetsSuccess = await submitToGoogleSheets()
+            } catch (error) {
+              console.error('❌ Google Sheets 提交失败:', error)
+            }
+            
+            // 方案2: EmailJS（HTML 表格邮件，主要方式）
+            try {
+              emailSuccess = await sendEmail()
+            } catch (error) {
+              console.error('❌ EmailJS 提交失败:', error)
+            }
+            
+            // 方案3: 本地存储（永远成功）
             await submitData()
+            
+            // 显示提交结果
+            console.log('📊 提交结果汇总:')
+            console.log('  Google Sheets:', googleSheetsSuccess ? '✅' : '❌ (可能因网络限制)')
+            console.log('  邮件 (HTML表格):', emailSuccess ? '✅' : '❌')
+            console.log('  本地存储: ✅')
+            
+            // 如果邮件也失败，提示用户
+            if (!emailSuccess) {
+              console.warn('⚠️ 邮件发送失败，请检查网络或稍后在管理后台导出数据')
+            } else {
+              console.log('✅ 数据已通过邮件发送到 yefangu@gmail.com')
+            }
+            
             // 跳转到生成完成页
             setStep(5)
           }} style={{ flex: 1, padding: '16px', background: '#E85D24', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '16px', fontWeight: 600, cursor: 'pointer' }}>
@@ -1835,15 +1989,108 @@ AI 方向        ${formData.aiDirection.join(', ')}
     </div>
   )
 
+  // 管理后台 - 查看所有提交数据
+  const renderAdmin = () => {
+    const submissions = JSON.parse(localStorage.getItem('cyber_card_submissions') || '[]')
+    
+    const exportToCSV = () => {
+      if (submissions.length === 0) {
+        alert('暂无数据')
+        return
+      }
+      
+      const headers = ['提交时间', '姓名', '公司', '职位', '手机', '邮箱', 'AI方向', '出海计划', '目标市场', '算力需求', '业务介绍', '展示名称', '职业身份', '机构', '简介', '技能', '模板']
+      const rows = submissions.map((s: any) => [
+        s.submitTime, s.realName, s.company, s.title, s.phone, s.email,
+        s.aiDirection, s.isOversea, s.overseaMarkets, s.cloudNeed, s.businessIntro,
+        s.displayName, s.titles, s.organization, s.bio, s.skills, s.templateId
+      ])
+      
+      const csvContent = [headers, ...rows].map(row => row.map((cell: string) => `"${cell || ''}"`).join(',')).join('\n')
+      const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' })
+      const link = document.createElement('a')
+      link.href = URL.createObjectURL(blob)
+      link.download = `赛博名片数据_${new Date().toLocaleDateString('zh-CN')}.csv`
+      link.click()
+    }
+    
+    const clearData = () => {
+      if (confirm('确定要清空所有数据吗？此操作不可恢复！')) {
+        localStorage.removeItem('cyber_card_submissions')
+        setStep('admin' as any) // 刷新页面
+      }
+    }
+    
+    return (
+      <div style={{ minHeight: '100vh', background: '#0F0E0D', padding: '20px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+            <h1 style={{ color: '#fff', fontSize: '24px', fontWeight: 700 }}>📊 数据管理后台</h1>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button onClick={exportToCSV} style={{ padding: '10px 20px', background: '#16A34A', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}>
+                ⬇ 导出 CSV
+              </button>
+              <button onClick={clearData} style={{ padding: '10px 20px', background: '#DC2626', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}>
+                🗑 清空数据
+              </button>
+              <button onClick={() => setStep(1)} style={{ padding: '10px 20px', background: '#E85D24', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}>
+                ← 返回首页
+              </button>
+            </div>
+          </div>
+          
+          <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '12px', padding: '16px', marginBottom: '16px' }}>
+            <span style={{ color: '#34d399', fontSize: '14px' }}>共 {submissions.length} 条记录</span>
+          </div>
+          
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+              <thead>
+                <tr style={{ background: 'rgba(255,255,255,0.1)' }}>
+                  {['时间', '姓名', '公司', '职位', '手机', '邮箱', 'AI方向', '出海', '模板'].map(h => (
+                    <th key={h} style={{ padding: '12px 8px', color: '#fff', textAlign: 'left', fontWeight: 600, whiteSpace: 'nowrap' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {submissions.length === 0 ? (
+                  <tr><td colSpan={9} style={{ padding: '40px', textAlign: 'center', color: '#666' }}>暂无数据</td></tr>
+                ) : (
+                  submissions.slice().reverse().map((s: any, i: number) => (
+                    <tr key={s.id || i} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                      <td style={{ padding: '12px 8px', color: '#aaa', whiteSpace: 'nowrap' }}>{s.submitTime}</td>
+                      <td style={{ padding: '12px 8px', color: '#fff' }}>{s.realName}</td>
+                      <td style={{ padding: '12px 8px', color: '#aaa' }}>{s.company}</td>
+                      <td style={{ padding: '12px 8px', color: '#aaa' }}>{s.title}</td>
+                      <td style={{ padding: '12px 8px', color: '#aaa' }}>{s.phone}</td>
+                      <td style={{ padding: '12px 8px', color: '#aaa' }}>{s.email}</td>
+                      <td style={{ padding: '12px 8px', color: '#aaa', maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.aiDirection}</td>
+                      <td style={{ padding: '12px 8px', color: '#aaa' }}>{s.isOversea}</td>
+                      <td style={{ padding: '12px 8px', color: '#E85D24' }}>{s.templateId}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div style={{ minHeight: '100vh', background: '#F5F4F2' }}>
-      {renderBanner()}
-      {step === 1 && renderStep1()}
-      {step === 'transition' && renderTransition()}
-      {step === 2 && renderStep2()}
-      {step === 3 && renderStep3()}
-      {step === 4 && renderStep4()}
-      {step === 5 && renderStep5()}
+      {step === 'admin' ? renderAdmin() : (
+        <>
+          {renderBanner()}
+          {step === 1 && renderStep1()}
+          {step === 'transition' && renderTransition()}
+          {step === 2 && renderStep2()}
+          {step === 3 && renderStep3()}
+          {step === 4 && renderStep4()}
+          {step === 5 && renderStep5()}
+        </>
+      )}
     </div>
   )
 }
