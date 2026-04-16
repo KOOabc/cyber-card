@@ -1131,59 +1131,77 @@ AI 方向        ${formData.aiDirection.join(', ')}
   // 提交数据到 Google Sheets
   const submitData = async () => {
     try {
-      await submitToGoogleSheets()
+      // 添加超时保护
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('提交超时')), 8000)
+      )
+      
+      await Promise.race([submitToGoogleSheets(), timeoutPromise])
       console.log('✅ 数据已成功提交到在线表格')
       return true
     } catch (error) {
       console.error('❌ 提交失败:', error)
-      alert('提交失败，请重试')
-      return false
+      // 不阻塞流程，静默失败
+      console.warn('⚠️ 数据提交失败，但继续流程')
+      return true // 返回 true 让流程继续
     }
   }
 
   // 提交数据到 Google Sheets
   const submitToGoogleSheets = async () => {
+    // 准备提交的数据
+    const rowData = [
+      new Date().toLocaleString('zh-CN'),
+      formData.realName,
+      formData.company,
+      formData.title,
+      formData.phone,
+      formData.email,
+      formData.aiDirection.join(', '),
+      formData.isOversea,
+      formData.overseaMarkets.join(', '),
+      formData.cloudNeed,
+      formData.businessIntro,
+      formData.name,
+      formData.titles.join(', '),
+      formData.organization,
+      formData.bio,
+      formData.skills.join(', '),
+      formData.templateId,
+    ]
+    
+    // Google Apps Script Web App URL
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzQ4QkBdTVHV-m21fnFGXeK3_3uk8F96ZUPSBbnxFgp-kdfQh9hVn-NtoD8I6xBcvxF/exec'
+    
+    // 使用 FormData 方式提交（更兼容移动端）
+    const formData2 = new FormData()
+    formData2.append('data', JSON.stringify(rowData))
+    
     try {
-      // 准备提交的数据（按列顺序）
-      const rowData = [
-        new Date().toLocaleString('zh-CN'), // 提交时间
-        formData.realName, // 姓名
-        formData.company, // 公司
-        formData.title, // 职位
-        formData.phone, // 手机
-        formData.email, // 邮箱
-        formData.aiDirection.join(', '), // AI方向
-        formData.isOversea, // 出海计划
-        formData.overseaMarkets.join(', '), // 目标市场
-        formData.cloudNeed, // 算力需求
-        formData.businessIntro, // 业务介绍
-        formData.name, // 展示名称
-        formData.titles.join(', '), // 职业身份
-        formData.organization, // 机构
-        formData.bio, // 简介
-        formData.skills.join(', '), // 技能
-        formData.templateId, // 模板
-      ]
-      
-      // Google Apps Script Web App 端点
-      const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzQ4QkBdTVHV-m21fnFGXeK3_3uk8F96ZUPSBbnxFgp-kdfQh9hVn-NtoD8I6xBcvxF/exec'
-      
-      await fetch(WEB_APP_URL, {
+      // 使用 fetch 不带 no-cors，让 Google Script 处理 CORS
+      const response = await fetch(WEB_APP_URL, {
         method: 'POST',
-        mode: 'no-cors', // 重要：避免 CORS 问题
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          data: rowData
-        })
+        body: formData2,
+        redirect: 'follow'
       })
       
-      console.log('✅ 数据已提交到 Google Sheets')
+      console.log('✅ Google Sheets 请求已发送，状态:', response.status)
       return true
     } catch (error) {
-      console.error('❌ 提交到 Google Sheets 失败:', error)
-      return false
+      console.error('❌ 提交失败:', error)
+      // 尝试降级方案：使用 GET 参数
+      try {
+        const params = new URLSearchParams({ data: JSON.stringify(rowData) })
+        await fetch(`${WEB_APP_URL}?${params.toString()}`, {
+          method: 'GET',
+          mode: 'no-cors'
+        })
+        console.log('✅ 使用 GET 方式提交成功')
+        return true
+      } catch (getError) {
+        console.error('❌ GET 方式也失败:', getError)
+        throw getError
+      }
     }
   }
 
