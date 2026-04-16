@@ -8,7 +8,7 @@ interface FormData {
   businessDesc: string
   eventPurpose: string[]
   channel: string
-  displayName: string
+  name: string
   titles: string[]
   organization: string
   bio: string
@@ -27,7 +27,7 @@ interface FormData {
 
 const initialFormData: FormData = {
   industry: '', isOversea: '', businessDesc: '', eventPurpose: [], channel: '',
-  displayName: '', titles: [], organization: '', bio: '', skills: [], avatar: '',
+  name: '', titles: [], organization: '', bio: '', skills: [], avatar: '',
   cardEmail: '', wechat: '', xiaohongshu: '', linkedin: '', website: '',
   showEmail: false, showSocial: false, showWebsite: false,
   templateId: 'cyber_orange'
@@ -35,93 +35,145 @@ const initialFormData: FormData = {
 
 // ========== 模板组件 ==========
 
-// 1. Cyber Orange - 赛博朋克风格
+// 1. Cyber Orange - 赛博朋克风格（增强版）
 function CyberOrangeCard({ data }: { data: FormData }) {
   return (
     <div style={{
       width: '340px',
       height: '200px',
-      background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%)',
+      background: 'linear-gradient(135deg, #FFBE9D 0%, #FF9F7A 15%, #FF8252 35%, #E85D24 60%, #D64810 80%, #FF9870 100%)',
       borderRadius: '20px',
-      padding: '24px',
       position: 'relative',
-      overflow: 'hidden',
-      fontFamily: "'Inter', sans-serif",
+      overflow: 'visible',
+      fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif",
+      boxShadow: '0 40px 120px rgba(232,93,36,0.35)',
     }}>
-      {/* 背景装饰 */}
+      {/* 背景装饰 - 浮动球体 */}
+      <div style={{ position: 'absolute', top: '-35px', right: '15px', width: '90px', height: '90px', background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4), rgba(255,200,170,0.25) 40%, rgba(232,93,36,0.15) 70%, transparent)', borderRadius: '50%', filter: 'blur(3px)', pointerEvents: 'none', zIndex: 0 }} />
+      <div style={{ position: 'absolute', bottom: '-30px', left: '-25px', width: '70px', height: '70px', background: 'linear-gradient(135deg, rgba(255,180,140,0.45), rgba(232,93,36,0.3))', borderRadius: '50%', filter: 'blur(2px)', pointerEvents: 'none', zIndex: 0 }} />
+      <div style={{ position: 'absolute', top: '30px', right: '-20px', width: '55px', height: '55px', border: '2px solid rgba(255,255,255,0.2)', borderRadius: '50%', borderLeftColor: 'transparent', borderBottomColor: 'transparent', transform: 'rotate(25deg)', pointerEvents: 'none', zIndex: 0 }} />
+
+      {/* 毛玻璃面板 - Swiss 布局 */}
       <div style={{
         position: 'absolute',
-        top: '-30px',
-        right: '-30px',
-        width: '120px',
-        height: '120px',
-        background: 'radial-gradient(circle, rgba(232,93,36,0.4) 0%, transparent 70%)',
-        borderRadius: '50%',
-      }} />
-      <div style={{
-        position: 'absolute',
-        bottom: '-20px',
-        left: '-20px',
-        width: '100px',
-        height: '100px',
-        background: 'radial-gradient(circle, rgba(255,107,107,0.3) 0%, transparent 70%)',
-        borderRadius: '50%',
-      }} />
-      
-      {/* 网格背景 */}
-      <div style={{
-        position: 'absolute',
-        inset: 0,
-        backgroundImage: 'linear-gradient(rgba(232,93,36,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(232,93,36,0.03) 1px, transparent 1px)',
-        backgroundSize: '20px 20px',
-      }} />
-      
-      {/* 内容 */}
-      <div style={{ position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        top: '18px',
+        left: '26px',
+        right: '26px',
+        bottom: '18px',
+        background: 'linear-gradient(135deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.14) 100%)',
+        backdropFilter: 'blur(28px) saturate(160%)',
+        WebkitBackdropFilter: 'blur(28px) saturate(160%)',
+        borderRadius: '14px',
+        border: '1.5px solid rgba(255,255,255,0.4)',
+        borderBottom: '1px solid rgba(255,255,255,0.25)',
+        borderRight: '1px solid rgba(255,255,255,0.25)',
+        boxShadow: '0 14px 35px rgba(0,0,0,0.15), inset 0 1px 2px rgba(255,255,255,0.55), inset 0 -1px 2px rgba(232,93,36,0.1)',
+        padding: '16px 20px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        overflow: 'hidden',
+        zIndex: 1,
+      }}>
+        {/* 顶部：姓名 + 职位 */}
         <div>
-          <h2 style={{ color: '#fff', fontSize: '22px', fontWeight: 700, marginBottom: '6px', letterSpacing: '-0.5px' }}>
-            {data.displayName || '您的姓名'}
-          </h2>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-            {data.titles.slice(0, 3).map((t, i) => (
-              <span key={i} style={{
-                background: 'rgba(232,93,36,0.15)',
-                color: '#E85D24',
-                padding: '3px 10px',
-                borderRadius: '12px',
-                fontSize: '11px',
-                fontWeight: 500,
-              }}>{t}</span>
-            ))}
-          </div>
-        </div>
-        
-        <div>
-          {data.organization && (
-            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '12px', marginBottom: '4px' }}>{data.organization}</p>
+          <h1 style={{
+            fontSize: '22px',
+            fontWeight: 800,
+            color: '#FFFFFF',
+            letterSpacing: '-0.8px',
+            lineHeight: 1.1,
+            margin: '0 0 8px 0',
+            textAlign: 'left',
+            textShadow: '0 1px 4px rgba(0,0,0,0.12)',
+          }}>
+            {data.name || 'Your Name'}
+          </h1>
+
+          {data.titles.length > 0 && (
+            <div style={{ marginBottom: '8px' }}>
+              {data.titles.slice(0, 2).map((t, i) => (
+                <div key={i} style={{
+                  fontSize: '10px',
+                  color: 'rgba(255,255,255,0.88)',
+                  fontWeight: 500,
+                  margin: '3px 0',
+                  letterSpacing: '0.2px',
+                  lineHeight: 1.3,
+                  textAlign: 'left',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}>
+                  {t}
+                </div>
+              ))}
+            </div>
           )}
-          <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '11px', lineHeight: 1.4 }}>
-            {data.bio || '个人简介'}
-          </p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '8px' }}>
-            {data.skills.slice(0, 4).map((s, i) => (
-              <span key={i} style={{ color: 'rgba(255,255,255,0.4)', fontSize: '10px' }}>#{s}</span>
-            ))}
-          </div>
+
+          {data.skills && data.skills.length > 0 && (
+            <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', marginTop: '6px' }}>
+              {data.skills.slice(0, 3).map((s, i) => (
+                <span key={i} style={{
+                  background: 'rgba(255,255,255,0.22)',
+                  color: 'rgba(255,255,255,0.92)',
+                  padding: '3px 9px',
+                  borderRadius: '9px',
+                  fontSize: '8px',
+                  fontWeight: 500,
+                  border: '1px solid rgba(255,255,255,0.28)',
+                }}>{s}</span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* 底部：机构 + 联系方式 */}
+        <div style={{ textAlign: 'left' }}>
+          {data.bio && (
+            <div style={{
+              fontSize: '8px',
+              color: 'rgba(255,255,255,0.78)',
+              lineHeight: 1.4,
+              marginBottom: '6px',
+              maxWidth: '88%',
+            }}>
+              {data.bio}
+            </div>
+          )}
+
+          {data.organization && (
+            <div style={{
+              fontSize: '9px',
+              color: 'rgba(255,255,255,0.82)',
+              marginBottom: '4px',
+              fontWeight: 500,
+            }}>
+              {data.organization}
+            </div>
+          )}
+
+          {(data.cardPhone || data.cardEmail) && (
+            <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
+              {data.cardPhone && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '3px', fontSize: '8px', color: 'rgba(255,255,255,0.72)' }}>
+                  <span style={{ fontSize: '9px' }}>📞</span>
+                  <span>{data.cardPhone}</span>
+                </div>
+              )}
+              {data.cardEmail && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '3px', fontSize: '8px', color: 'rgba(255,255,255,0.72)' }}>
+                  <span style={{ fontSize: '9px' }}>✉️</span>
+                  <span>{data.cardEmail}</span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
-      
-      {/* 角标 */}
-      <div style={{
-        position: 'absolute',
-        top: '16px',
-        right: '16px',
-        width: '8px',
-        height: '8px',
-        background: '#E85D24',
-        borderRadius: '2px',
-        boxShadow: '0 0 12px rgba(232,93,36,0.8)',
-      }} />
+
+      {/* 高光 */}
+      <div style={{ position: 'absolute', top: '22px', left: '30px', width: '45px', height: '45px', background: 'radial-gradient(circle at center, rgba(255,255,255,0.18) 0%, transparent 70%)', borderRadius: '50%', filter: 'blur(12px)', pointerEvents: 'none', zIndex: 2 }} />
     </div>
   )
 }
@@ -134,7 +186,7 @@ function NeoWhiteCard({ data }: { data: FormData }) {
       height: '200px',
       background: 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
       borderRadius: '24px',
-      padding: '28px',
+      padding: '20px',
       position: 'relative',
       overflow: 'hidden',
       boxShadow: '0 20px 60px rgba(0,0,0,0.1), inset 0 -2px 10px rgba(0,0,0,0.03)',
@@ -147,31 +199,31 @@ function NeoWhiteCard({ data }: { data: FormData }) {
         background: 'radial-gradient(circle at 100% 0%, rgba(232,93,36,0.03) 0%, transparent 50%)',
       }} />
       
-      <div style={{ position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-        <div>
-          <h2 style={{ color: '#1a1a1a', fontSize: '24px', fontWeight: 700, marginBottom: '8px', letterSpacing: '-0.8px' }}>
-            {data.displayName || '您的姓名'}
+      <div style={{ position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ flex: 1 }}>
+          <h2 style={{ color: '#1a1a1a', fontSize: '22px', fontWeight: 700, marginBottom: '6px', letterSpacing: '-0.5px' }}>
+            {data.name || '您的姓名'}
           </h2>
           {data.titles[0] && (
-            <p style={{ color: '#666', fontSize: '13px', fontWeight: 500, marginBottom: '4px' }}>{data.titles[0]}</p>
+            <p style={{ color: '#666', fontSize: '12px', fontWeight: 500, marginBottom: '4px' }}>{data.titles[0]}</p>
           )}
           {data.organization && (
-            <p style={{ color: '#999', fontSize: '12px' }}>{data.organization}</p>
+            <p style={{ color: '#999', fontSize: '11px' }}>{data.organization}</p>
           )}
         </div>
         
-        <div>
-          <p style={{ color: '#666', fontSize: '12px', lineHeight: 1.5, marginBottom: '10px', maxWidth: '85%' }}>
+        <div style={{ flexShrink: 0, marginTop: '12px' }}>
+          <p style={{ color: '#666', fontSize: '11px', lineHeight: 1.4, marginBottom: '8px' }}>
             {data.bio || '个人简介'}
           </p>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            {data.skills.slice(0, 3).map((s, i) => (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+            {data.skills.slice(0, 4).map((s, i) => (
               <span key={i} style={{
                 color: '#E85D24',
-                fontSize: '11px',
+                fontSize: '10px',
                 fontWeight: 500,
-                padding: '4px 0',
-                borderBottom: '1.5px solid #E85D24',
+                padding: '2px 6px',
+                borderBottom: '1px solid #E85D24',
               }}>{s}</span>
             ))}
           </div>
@@ -184,7 +236,7 @@ function NeoWhiteCard({ data }: { data: FormData }) {
         bottom: 0,
         left: 0,
         right: 0,
-        height: '3px',
+        height: '2px',
         background: 'linear-gradient(90deg, #E85D24, #ff8c42)',
       }} />
     </div>
@@ -194,7 +246,7 @@ function NeoWhiteCard({ data }: { data: FormData }) {
 // 3. Terminal Dark - 黑客终端
 function TerminalDarkCard({ data }: { data: FormData }) {
   const [showCursor] = useState(true)
-  
+   
   return (
     <div style={{
       width: '340px',
@@ -211,41 +263,47 @@ function TerminalDarkCard({ data }: { data: FormData }) {
       <div style={{
         display: 'flex',
         gap: '6px',
-        marginBottom: '16px',
+        marginBottom: '12px',
       }}>
         <div style={{ width: '10px', height: '10px', background: '#ff5f56', borderRadius: '50%' }} />
         <div style={{ width: '10px', height: '10px', background: '#ffbd2e', borderRadius: '50%' }} />
         <div style={{ width: '10px', height: '10px', background: '#27c93f', borderRadius: '50%' }} />
       </div>
       
-      {/* 内容 */}
-      <div style={{ fontSize: '11px', lineHeight: 1.6 }}>
-        <p style={{ color: '#8b949e' }}>
-          <span style={{ color: '#58a6ff' }}>const</span> profile = {'{'}
-        </p>
-        <p style={{ color: '#8b949e', paddingLeft: '16px' }}>
-          name: <span style={{ color: '#a5d6ff' }}>"{data.displayName || 'User'}"</span>,
-        </p>
-        <p style={{ color: '#8b949e', paddingLeft: '16px' }}>
-          title: <span style={{ color: '#a5d6ff' }}>"{data.titles[0] || 'Title'}"</span>,
-        </p>
-        <p style={{ color: '#8b949e', paddingLeft: '16px' }}>
-          org: <span style={{ color: '#a5d6ff' }}>"{data.organization || 'Organization'}"</span>,
-        </p>
-        <p style={{ color: '#8b949e', paddingLeft: '16px' }}>
-          skills: <span style={{ color: '#7ee787' }}>[{data.skills.slice(0, 3).map(s => `"${s}"`).join(', ') || '""'}]</span>
-        </p>
-        <p style={{ color: '#8b949e' }}>{'}'}</p>
-        <p style={{ color: '#27c93f', marginTop: '8px' }}>
-          {'>'} {data.bio || 'Hello World'}{showCursor ? <span style={{ 
-            display: 'inline-block', 
-            width: '8px', 
-            height: '14px', 
-            background: '#27c93f', 
-            marginLeft: '2px',
-            verticalAlign: 'middle',
-          }} /> : null}
-        </p>
+      {/* 内容 - 重新布局以避免遮挡 */}
+      <div style={{ fontSize: '10px', lineHeight: 1.5, height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ flex: 1, overflow: 'hidden' }}>
+          <p style={{ color: '#8b949e', marginBottom: '4px' }}>
+            <span style={{ color: '#58a6ff' }}>const</span> profile = {'{'}
+          </p>
+          <p style={{ color: '#8b949e', marginBottom: '4px', paddingLeft: '16px' }}>
+            name: <span style={{ color: '#a5d6ff' }}>"{data.name || 'User'}"</span>,
+          </p>
+          <p style={{ color: '#8b949e', marginBottom: '4px', paddingLeft: '16px' }}>
+            title: <span style={{ color: '#a5d6ff' }}>"{data.titles[0] || 'Title'}"</span>,
+          </p>
+          <p style={{ color: '#8b949e', marginBottom: '4px', paddingLeft: '16px' }}>
+            org: <span style={{ color: '#a5d6ff' }}>"{data.organization || 'Organization'}"</span>,
+          </p>
+          <p style={{ color: '#8b949e', marginBottom: '4px', paddingLeft: '16px' }}>
+            skills: <span style={{ color: '#7ee787' }}>[{data.skills.slice(0, 3).map(s => `"${s}"`).join(', ') || '""'}]</span>
+          </p>
+          <p style={{ color: '#8b949e', marginBottom: '4px' }}>
+            {'}'}
+          </p>
+        </div>
+        <div style={{ flexShrink: 0 }}>
+          <p style={{ color: '#27c93f', fontSize: '10px' }}>
+            {'>'} {data.bio || 'Hello World'}{showCursor ? <span style={{ 
+              display: 'inline-block', 
+              width: '6px', 
+              height: '12px', 
+              background: '#27c93f', 
+              marginLeft: '2px',
+              verticalAlign: 'middle',
+            }} /> : null}
+          </p>
+        </div>
       </div>
     </div>
   )
@@ -286,7 +344,7 @@ function ForestGreenCard({ data }: { data: FormData }) {
       <div style={{ position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         <div>
           <h2 style={{ color: '#fff', fontSize: '22px', fontWeight: 700, marginBottom: '6px' }}>
-            {data.displayName || '您的姓名'}
+            {data.name || '您的姓名'}
           </h2>
           {data.titles[0] && (
             <p style={{ color: 'rgba(52,211,153,0.9)', fontSize: '12px', fontWeight: 500 }}>{data.titles[0]}</p>
