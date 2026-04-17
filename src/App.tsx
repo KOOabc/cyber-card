@@ -94,6 +94,7 @@ interface FormData {
   company: string
   title: string
   phone: string
+  wechat: string  // 微信号
   email: string
   // Phase 2 名片内容（所有字段必填用于后台收集）
   name: string              // 姓名（预填自 realName）
@@ -117,6 +118,7 @@ interface FormData {
     titles: boolean         // 默认 true
     organization: boolean   // 默认 true
     phone: boolean          // 默认 true
+    wechat: boolean         // 默认 true
     email: boolean          // 默认 true
     bio: boolean            // 默认 true
     skills: boolean         // 默认 true
@@ -129,7 +131,7 @@ interface FormData {
 
 const initialFormData: FormData = {
   aiDirection: [], isOversea: '', overseaMarkets: [], cloudNeed: '', businessIntro: '',
-  realName: '', company: '', title: '', phone: '', email: '',
+  realName: '', company: '', title: '', phone: '', wechat: '', email: '',
   name: '', titles: [], organization: '', cardPhone: '', cardEmail: '',
   bio: '', skills: [], avatarPreview: '',
   socialAccounts: { wechat: '', xiaohongshu: '', x: '', linkedin: '' },
@@ -139,6 +141,7 @@ const initialFormData: FormData = {
     titles: true,
     organization: true,
     phone: true,
+    wechat: true,
     email: true,
     bio: true,
     skills: true,
@@ -1535,7 +1538,7 @@ AI 方向        ${formData.aiDirection.join(', ')}
   // Step 2: 基础信息（合并版 - 包含联系方式）
   const renderStep2 = () => {
     const handleNext = () => {
-      if (!formData.realName || !formData.company || !formData.title || !formData.phone || !formData.email) {
+      if (!formData.realName || !formData.company || !formData.title || !formData.phone || !formData.wechat || !formData.email) {
         alert('请完成所有必填项')
         return
       }
@@ -1580,6 +1583,12 @@ AI 方向        ${formData.aiDirection.join(', ')}
           <div style={{ fontWeight: 600, marginBottom: '8px' }}>手机号 <span style={{ color: '#E85D24' }}>*</span></div>
           <input value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
             placeholder="例如：138 0000 0000" style={{ width: '100%', padding: '12px 14px', border: '2px solid #e0e0e0', borderRadius: '10px', fontSize: '14px', outline: 'none' }} />
+        </div>
+
+        <div style={{ background: '#fff', borderRadius: '16px', padding: '20px', marginBottom: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+          <div style={{ fontWeight: 600, marginBottom: '8px' }}>微信号 <span style={{ color: '#E85D24' }}>*</span></div>
+          <input value={formData.wechat} onChange={(e) => setFormData({ ...formData, wechat: e.target.value })}
+            placeholder="例如：your_wechat_id" style={{ width: '100%', padding: '12px 14px', border: '2px solid #e0e0e0', borderRadius: '10px', fontSize: '14px', outline: 'none' }} />
         </div>
 
         <div style={{ background: '#fff', borderRadius: '16px', padding: '20px', marginBottom: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
@@ -1662,6 +1671,18 @@ AI 方向        ${formData.aiDirection.join(', ')}
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', background: '#f9f9f9', borderRadius: '8px' }}>
+            <div>
+              <div style={{ fontWeight: 500, fontSize: '14px' }}>微信号</div>
+              <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>{formData.wechat}</div>
+            </div>
+            <VisibilityToggle
+              visible={formData.visibility.wechat}
+              onChange={(v) => setFormData({ ...formData, visibility: { ...formData.visibility, wechat: v } })}
+              tooltip="微信号展示"
+            />
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', background: '#f9f9f9', borderRadius: '8px' }}>
             <div style={{ flex: 1, overflow: 'hidden' }}>
               <div style={{ fontWeight: 500, fontSize: '14px' }}>邮箱</div>
               <div style={{ fontSize: '12px', color: '#666', marginTop: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{formData.email}</div>
@@ -1677,86 +1698,114 @@ AI 方向        ${formData.aiDirection.join(', ')}
 
       {/* 头像上传区域 */}
       <div style={{ background: '#fff', borderRadius: '16px', padding: '20px', marginBottom: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-        <div style={{ fontWeight: 600, marginBottom: '12px' }}>
-          📸 头像上传
-          <span style={{ color: '#999', fontSize: '11px', marginLeft: '8px' }}>（选填，支持 JPG/PNG/WebP，最大 5MB）</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+          <div>
+            <div style={{ fontWeight: 600 }}>
+              📸 头像设置
+            </div>
+            <div style={{ color: '#999', fontSize: '11px', marginTop: '4px' }}>选填，支持 JPG/PNG/WebP，最大 5MB</div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '12px', color: formData.visibility.avatar ? '#E85D24' : '#999' }}>
+              {formData.visibility.avatar ? '显示头像' : '不显示头像'}
+            </span>
+            <VisibilityToggle
+              visible={formData.visibility.avatar}
+              onChange={(v) => setFormData({ ...formData, visibility: { ...formData.visibility, avatar: v } })}
+              tooltip="头像显示开关"
+            />
+          </div>
         </div>
         
-        <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-          {/* 头像预览 */}
-          <div style={{
-            width: '100px',
-            height: '100px',
-            borderRadius: '50%',
-            overflow: 'hidden',
-            background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            border: '3px solid',
-            borderColor: formData.avatarPreview ? '#E85D24' : '#e0e0e0',
-            boxShadow: formData.avatarPreview ? '0 0 20px rgba(232,93,36,0.3)' : 'none',
-          }}>
-            {formData.avatarPreview ? (
-              <img src={formData.avatarPreview} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            ) : (
-              <DefaultAvatar size={60} />
-            )}
-          </div>
-
-          {/* 上传区域 */}
-          <div style={{ flex: 1 }}>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/jpeg,image/jpg,image/png,image/webp"
-              onChange={handleFileChange}
-              style={{ display: 'none' }}
-            />
-            <div
-              onClick={handleAvatarClick}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-              style={{
-                border: `2px dashed ${isDragging ? '#E85D24' : '#e0e0e0'}`,
-                borderRadius: '12px',
-                padding: '20px',
-                textAlign: 'center',
-                cursor: 'pointer',
-                background: isDragging ? 'rgba(232,93,36,0.05)' : '#fafafa',
-                transition: 'all 0.2s',
-              }}
-            >
-              <div style={{ color: '#E85D24', fontSize: '24px', marginBottom: '8px' }}>📸</div>
-              <div style={{ color: '#666', fontSize: '14px', marginBottom: '4px' }}>
-                {isDragging ? '释放以上传' : '点击上传或拖拽图片到此处'}
-              </div>
-              <div style={{ color: '#999', fontSize: '12px' }}>支持 JPG、PNG、WebP 格式，最大 5MB</div>
+        {formData.visibility.avatar ? (
+          <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+            {/* 头像预览 */}
+            <div style={{
+              width: '100px',
+              height: '100px',
+              borderRadius: '50%',
+              overflow: 'hidden',
+              background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '3px solid',
+              borderColor: formData.avatarPreview ? '#E85D24' : '#e0e0e0',
+              boxShadow: formData.avatarPreview ? '0 0 20px rgba(232,93,36,0.3)' : 'none',
+            }}>
+              {formData.avatarPreview ? (
+                <img src={formData.avatarPreview} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <DefaultAvatar size={60} />
+              )}
             </div>
-            {formData.avatarPreview && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setFormData({ ...formData, avatarPreview: '' })
-                }}
+
+            {/* 上传区域 */}
+            <div style={{ flex: 1 }}>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/webp"
+                onChange={handleFileChange}
+                style={{ display: 'none' }}
+              />
+              <div
+                onClick={handleAvatarClick}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
                 style={{
-                  marginTop: '10px',
-                  padding: '8px 16px',
-                  background: 'transparent',
-                  color: '#E85D24',
-                  border: '1px solid #E85D24',
-                  borderRadius: '8px',
-                  fontSize: '13px',
+                  border: `2px dashed ${isDragging ? '#E85D24' : '#e0e0e0'}`,
+                  borderRadius: '12px',
+                  padding: '20px',
+                  textAlign: 'center',
                   cursor: 'pointer',
-                  width: '100%',
+                  background: isDragging ? 'rgba(232,93,36,0.05)' : '#fafafa',
+                  transition: 'all 0.2s',
                 }}
               >
-                重新上传
-              </button>
-            )}
+                <div style={{ color: '#E85D24', fontSize: '24px', marginBottom: '8px' }}>📸</div>
+                <div style={{ color: '#666', fontSize: '14px', marginBottom: '4px' }}>
+                  {isDragging ? '释放以上传' : '点击上传或拖拽图片到此处'}
+                </div>
+                <div style={{ color: '#999', fontSize: '12px' }}>支持 JPG、PNG、WebP 格式，最大 5MB</div>
+              </div>
+              {formData.avatarPreview && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setFormData({ ...formData, avatarPreview: '' })
+                  }}
+                  style={{
+                    marginTop: '10px',
+                    padding: '8px 16px',
+                    background: 'transparent',
+                    color: '#E85D24',
+                    border: '1px solid #E85D24',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    cursor: 'pointer',
+                    width: '100%',
+                  }}
+                >
+                  重新上传
+                </button>
+              )}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div style={{ 
+            padding: '24px', 
+            background: '#f9f9f9', 
+            borderRadius: '12px', 
+            textAlign: 'center',
+            border: '2px dashed #e0e0e0'
+          }}>
+            <div style={{ fontSize: '32px', marginBottom: '8px', opacity: 0.5 }}>🙈</div>
+            <div style={{ color: '#666', fontSize: '14px', marginBottom: '4px' }}>头像已隐藏</div>
+            <div style={{ color: '#999', fontSize: '12px' }}>名片上将不显示头像，如需显示请打开上方开关</div>
+          </div>
+        )}
       </div>
 
       {/* 个人简介 */}
