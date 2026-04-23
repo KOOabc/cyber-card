@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gmail 批量提取工具 - 赛博名片</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.95);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      color: #333;
+    }
+    h1 {
+      font-size: 32px;
+      margin-bottom: 12px;
+      color: #667eea;
+      text-align: center;
+    }
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 32px;
+      font-size: 15px;
+    }
+    .method-card {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      border-left: 4px solid #667eea;
+    }
+    .method-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge {
+      background: #16A34A;
+      color: #fff;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .step {
+      background: white;
+      padding: 16px 20px;
+      border-radius: 8px;
+      margin: 12px 0;
+      border-left: 3px solid #667eea;
+    }
+    .step-number {
+      display: inline-block;
+      background: #667eea;
+      color: #fff;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 28px;
+      font-weight: 700;
+      margin-right: 12px;
+    }
+    .bookmarklet-box {
+      background: #1e293b;
+      color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      margin: 16px 0;
+      position: relative;
+      overflow-x: auto;
+    }
+    .bookmarklet-link {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      padding: 14px 28px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 16px;
+      margin: 16px 0;
+      box-shadow: 0 4px 15px rgba(102,126,234,0.4);
+      transition: all 0.2s;
+      cursor: move;
+    }
+    .bookmarklet-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102,126,234,0.5);
+    }
+    .code {
+      background: rgba(102,126,234,0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Monaco', monospace;
+      font-size: 13px;
+      color: #667eea;
+    }
+    .warning {
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 20px 0;
+      color: #92400e;
+    }
+    .info {
+      background: #dbeafe;
+      border-left: 4px solid #3b82f6;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 20px 0;
+      color: #1e40af;
+    }
+    .success {
+      background: #d1fae5;
+      border-left: 4px solid #10b981;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 20px 0;
+      color: #065f46;
+    }
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background: #667eea;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      margin: 8px;
+    }
+    .btn:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+    }
+    .video-placeholder {
+      background: #f1f5f9;
+      border: 2px dashed #cbd5e1;
+      border-radius: 8px;
+      padding: 40px;
+      text-align: center;
+      color: #64748b;
+      margin: 16px 0;
+    }
+    pre {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .highlight {
+      background: #fef08a;
+      padding: 2px 4px;
+      border-radius: 3px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📧 Gmail 批量提取工具</h1>
+    <p class="subtitle">一键从 Gmail 批量提取赛博名片用户数据</p>
+
+    <div class="success">
+      <strong>🎯 解决方案：</strong> 使用书签工具（Bookmarklet），在 Gmail 页面一键提取所有可见邮件的内容！<br>
+      <strong>优势：</strong> 无需逐个打开邮件，无需安装插件，一键提取所有数据。
+    </div>
+
+    <!-- 方法1：书签工具 -->
+    <div class="method-card">
+      <div class="method-title">
+        <span>方法1：书签工具（推荐）</span>
+        <span class="badge">最简单</span>
+      </div>
+
+      <div class="info">
+        <strong>💡 什么是书签工具？</strong><br>
+        书签工具是一段可以拖到浏览器书签栏的 JavaScript 代码，点击后可以在当前页面执行特定功能。
+      </div>
+
+      <div class="step">
+        <span class="step-number">1</span>
+        <strong>添加书签工具</strong>
+        <div style="margin-top: 12px;">
+          <div style="background: #fff3cd; padding: 12px; border-radius: 6px; margin: 12px 0; border-left: 3px solid #ffc107;">
+            <strong>📌 拖动下方按钮到浏览器的书签栏：</strong>
+          </div>
+          
+          <a href="javascript:(function()%7Bconst%20data%3D%5B%5D%3Bconst%20threads%3Ddocument.querySelectorAll('%5Brole%3D%22main%22%5D%20%5Brole%3D%22row%22%5D')%3Bif(threads.length%3D%3D%3D0)%7Balert('%E2%9D%8C%20%E6%9C%AA%E6%89%BE%E5%88%B0%E9%82%AE%E4%BB%B6%EF%BC%8C%E8%AF%B7%E7%A1%AE%E4%BF%9D%E5%9C%A8%20Gmail%20%E9%82%AE%E4%BB%B6%E5%88%97%E8%A1%A8%E9%A1%B5%E9%9D%A2')%3Breturn%7Dlet%20extracted%3D0%3Bthreads.forEach(thread%3D%3E%7Bconst%20subject%3Dthread.querySelector('%5Bdata-thread-id%5D%20%5Bdata-legacy-thread-id%5D')%3Fthread.querySelector('%5Bdata-thread-id%5D%20%5Bdata-legacy-thread-id%5D').textContent.trim()%3A''%3Bconst%20sender%3Dthread.querySelector('%5Bemail%5D')%3Fthread.querySelector('%5Bemail%5D').getAttribute('email')%3A''%3Bconst%20preview%3Dthread.querySelector('.y2')%3Fthread.querySelector('.y2').textContent.trim()%3A''%3Bif(subject.includes('%E8%B5%9B%E5%8D%9A%E5%90%8D%E7%89%87')%7C%7Csubject.includes('%E6%96%B0%E7%9A%84%E8%B5%9B%E5%8D%9A%E5%90%8D%E7%89%87%E6%8F%90%E4%BA%A4'))%7Bdata.push(%7Bsubject%2Csender%2Cpreview%7D)%3Bextracted%2B%2B%7D%7D)%3Bif(extracted%3D%3D%3D0)%7Balert('%E2%9D%8C%20%E6%9C%AA%E6%89%BE%E5%88%B0%E7%AC%A6%E5%90%88%E6%9D%A1%E4%BB%B6%E7%9A%84%E9%82%AE%E4%BB%B6%EF%BC%8C%E8%AF%B7%E6%90%9C%E7%B4%A2%20%22%E8%B5%9B%E5%8D%9A%E5%90%8D%E7%89%87%22')%3Breturn%7Dconst%20jsonStr%3DJSON.stringify(data%2Cnull%2C2)%3Bconst%20blob%3Dnew%20Blob(%5B%22%5Cufeff%22%2BjsonStr%5D%2C%7Btype%3A'application%2Fjson%3Bcharset%3Dutf-8%3B'%7D)%3Bconst%20url%3DURL.createObjectURL(blob)%3Bconst%20a%3Ddocument.createElement('a')%3Ba.href%3Durl%3Ba.download%3D%60Gmail%E9%82%AE%E4%BB%B6%E6%95%B0%E6%8D%AE_%24%7Bnew%20Date().toISOString().slice(0%2C10)%7D.json%60%3Ba.click()%3Balert(%60%E2%9C%85%20%E5%B7%B2%E6%8F%90%E5%8F%96%20%24%7Bextracted%7D%20%E5%B0%81%E9%82%AE%E4%BB%B6%EF%BC%81%5Cn%5Cn%E6%95%B0%E6%8D%AE%E5%B7%B2%E4%BF%9D%E5%AD%98%E4%B8%BA%20JSON%20%E6%96%87%E4%BB%B6%60)%7D)()" 
+               class="bookmarklet-link"
+               onclick="alert('⚠️ 请将此按钮拖动到浏览器书签栏，而不是点击！\n\n拖动方法：\n1. 鼠标按住此按钮\n2. 拖动到浏览器顶部书签栏\n3. 松开鼠标'); return false;">
+            📧 提取Gmail数据
+          </a>
+
+          <div class="warning">
+            <strong>⚠️ 注意：</strong><br>
+            • 请<strong>拖动</strong>（不是点击）上方按钮到浏览器书签栏<br>
+            • 如果书签栏不可见，请按 <code>Ctrl+Shift+B</code> (Windows) 或 <code>Cmd+Shift+B</code> (Mac) 显示
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="step-number">2</span>
+        <strong>在 Gmail 中使用</strong>
+        <div style="margin-top: 12px; color: #666; line-height: 1.8;">
+          1. 打开 <a href="https://mail.google.com" target="_blank" style="color: #667eea;">Gmail</a><br>
+          2. 搜索：<code>赛博名片提交</code> 或 <code>from:service@emailjs.com</code><br>
+          3. 等待邮件列表加载完成<br>
+          4. <strong>点击书签栏中的 "提取Gmail数据" 按钮</strong><br>
+          5. 自动下载 JSON 文件，包含所有可见邮件的数据
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="step-number">3</span>
+        <strong>导出为 Excel</strong>
+        <div style="margin-top: 12px;">
+          下载的 JSON 文件可以通过以下方式转换为 Excel：
+          <div style="margin-top: 12px;">
+            <a href="/email-parser.html" class="btn" target="_blank">📊 使用在线转换工具</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 方法2：改进版书签工具（更强大） -->
+    <div class="method-card">
+      <div class="method-title">
+        <span>方法2：增强版工具</span>
+        <span class="badge" style="background: #667eea;">功能更强</span>
+      </div>
+
+      <div class="info">
+        <strong>🚀 增强功能：</strong><br>
+        • 自动滚动页面，加载更多邮件<br>
+        • 智能解析邮件内容，提取结构化数据<br>
+        • 直接导出为 CSV 格式，Excel 可直接打开
+      </div>
+
+      <div class="step">
+        <span class="step-number">1</span>
+        <strong>安装增强版工具</strong>
+        <div style="margin-top: 12px;">
+          <textarea id="enhancedScript" readonly style="width: 100%; height: 120px; padding: 12px; font-family: monospace; font-size: 12px; background: #1e293b; color: #e2e8f0; border: none; border-radius: 6px; resize: vertical;">
+javascript:(function(){let data=[];let processed=0;const delay=ms=>new Promise(r=>setTimeout(r,ms));async function scrollAndLoad(){const container=document.querySelector('[role="main"]');if(!container)return;let lastHeight=0;let attempts=0;while(attempts<10){container.scrollTo(0,container.scrollHeight);await delay(1000);const newHeight=container.scrollHeight;if(newHeight===lastHeight){break}lastHeight=newHeight;attempts++}alert('✅ 已加载所有邮件，开始提取...')}async function extractData(){await scrollAndLoad();const rows=document.querySelectorAll('[role="main"] [role="row"]');rows.forEach(row=>{const subject=row.querySelector('[data-legacy-thread-id]')?.textContent.trim()||'';if(subject.includes('赛博名片')||subject.includes('新的提交')){const sender=row.querySelector('[email]')?.getAttribute('email')||'';const preview=row.querySelector('.y2')?.textContent.trim()||'';data.push({subject,sender,preview,extractedAt:new Date().toISOString()});processed++}});if(processed===0){alert('❌ 未找到符合条件的邮件');return}const csv=[['序号','主题','发件人','预览','提取时间'],...data.map((d,i)=>[i+1,d.subject,d.sender,d.preview,d.extractedAt])].map(row=>row.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`Gmail数据_${new Date().toISOString().slice(0,10)}.csv`;a.click();alert(`✅ 已提取 ${processed} 封邮件！\n\n已导出为 CSV 文件，可用 Excel 打开`)}extractData()})()
+          </textarea>
+          <button class="btn" onclick="copyScript()" style="margin-top: 12px;">📋 复制脚本</button>
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="step-number">2</span>
+        <strong>创建书签</strong>
+        <div style="margin-top: 12px; color: #666; line-height: 1.8;">
+          1. 复制上方脚本<br>
+          2. 在浏览器中右键点击书签栏，选择"添加网页"或"新建书签"<br>
+          3. 名称填写：<code>提取Gmail数据（增强版）</code><br>
+          4. 网址/URL 填写：粘贴刚才复制的脚本<br>
+          5. 保存
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="step-number">3</span>
+        <strong>使用方法</strong>
+        <div style="margin-top: 12px; color: #666; line-height: 1.8;">
+          1. 打开 Gmail，搜索 <code>赛博名片</code><br>
+          2. 点击书签栏中的"提取Gmail数据（增强版）"<br>
+          3. 等待自动滚动并加载所有邮件<br>
+          4. 自动下载 CSV 文件，用 Excel 打开即可
+        </div>
+      </div>
+    </div>
+
+    <!-- 方法3：Chrome 开发者工具 -->
+    <div class="method-card">
+      <div class="method-title">
+        <span>方法3：Chrome 控制台（高级）</span>
+      </div>
+
+      <div class="step">
+        <span class="step-number">1</span>
+        <strong>打开 Chrome 开发者工具</strong>
+        <div style="margin-top: 12px; color: #666;">
+          在 Gmail 页面按 <code>F12</code> 或 <code>Ctrl+Shift+I</code> (Mac: <code>Cmd+Option+I</code>)
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="step-number">2</span>
+        <strong>切换到 Console (控制台) 标签</strong>
+      </div>
+
+      <div class="step">
+        <span class="step-number">3</span>
+        <strong>粘贴并运行脚本</strong>
+        <div style="margin-top: 12px;">
+          <pre id="consoleScript">// Gmail 批量提取脚本
+(async function() {
+  let data = [];
+  
+  // 滚动加载更多邮件
+  const container = document.querySelector('[role="main"]');
+  if (!container) {
+    alert('❌ 请确保在 Gmail 邮件列表页面');
+    return;
+  }
+  
+  console.log('🔄 开始加载邮件...');
+  let lastHeight = 0;
+  for (let i = 0; i < 10; i++) {
+    container.scrollTo(0, container.scrollHeight);
+    await new Promise(r => setTimeout(r, 1000));
+    if (container.scrollHeight === lastHeight) break;
+    lastHeight = container.scrollHeight;
+  }
+  
+  // 提取邮件数据
+  const rows = document.querySelectorAll('[role="main"] [role="row"]');
+  console.log(`📧 找到 ${rows.length} 封邮件`);
+  
+  rows.forEach((row, index) => {
+    const subject = row.querySelector('[data-legacy-thread-id]')?.textContent.trim() || '';
+    if (subject.includes('赛博名片') || subject.includes('新的提交')) {
+      const sender = row.querySelector('[email]')?.getAttribute('email') || '';
+      const preview = row.querySelector('.y2')?.textContent.trim() || '';
+      data.push({ 序号: index + 1, 主题: subject, 发件人: sender, 预览: preview });
+    }
+  });
+  
+  console.log(`✅ 提取到 ${data.length} 条数据`);
+  console.table(data);
+  
+  // 下载为 CSV
+  const headers = ['序号', '主题', '发件人', '预览'];
+  const csv = [
+    headers,
+    ...data.map(d => [d.序号, d.主题, d.发件人, d.预览])
+  ].map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+  
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Gmail数据_${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  
+  alert(`✅ 已提取 ${data.length} 封邮件\n已下载为 CSV 文件`);
+})();</pre>
+          <button class="btn" onclick="copyConsoleScript()">📋 复制脚本</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="warning">
+      <strong>⚠️ 重要提示：</strong><br>
+      • 这些工具仅提取邮件列表的预览信息，完整数据需要打开邮件查看<br>
+      • 建议使用 <a href="/email-parser.html" style="color: #667eea; font-weight: 600;">邮件解析工具</a> 来提取完整的用户数据<br>
+      • 所有操作均在本地浏览器完成，不会上传数据到服务器
+    </div>
+
+    <div class="success" style="text-align: center; margin-top: 32px;">
+      <strong>📖 完整文档：</strong><br>
+      <a href="https://github.com/KOOabc/cyber-card/blob/main/DATA_EXPORT_GUIDE.md" target="_blank" class="btn">查看完整导出指南</a>
+    </div>
+  </div>
+
+  <script>
+    function copyScript() {
+      const script = document.getElementById('enhancedScript');
+      script.select();
+      document.execCommand('copy');
+      alert('✅ 脚本已复制到剪贴板！\n\n现在可以创建书签了。');
+    }
+
+    function copyConsoleScript() {
+      const script = document.getElementById('consoleScript').textContent;
+      navigator.clipboard.writeText(script).then(() => {
+        alert('✅ 脚本已复制到剪贴板！\n\n现在可以粘贴到 Chrome 控制台运行了。');
+      });
+    }
+  </script>
+</body>
+</html>
