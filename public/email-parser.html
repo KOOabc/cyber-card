@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>邮件数据解析工具 - 赛博名片</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.95);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      color: #333;
+    }
+    h1 {
+      font-size: 32px;
+      margin-bottom: 12px;
+      color: #667eea;
+      text-align: center;
+    }
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 32px;
+      font-size: 15px;
+    }
+    .step {
+      background: #f8f9fa;
+      padding: 24px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      border-left: 4px solid #667eea;
+    }
+    .step-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .step-number {
+      background: #667eea;
+      color: #fff;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .step-content {
+      color: #555;
+      line-height: 1.8;
+      font-size: 14px;
+    }
+    .textarea-box {
+      width: 100%;
+      min-height: 200px;
+      padding: 16px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      font-size: 13px;
+      font-family: 'Monaco', 'Courier New', monospace;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    .textarea-box:focus {
+      border-color: #667eea;
+    }
+    .btn {
+      padding: 14px 28px;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-block;
+      text-decoration: none;
+      text-align: center;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(102,126,234,0.3);
+    }
+    .btn-success {
+      background: #16A34A;
+      color: #fff;
+    }
+    .btn-success:hover {
+      background: #15803d;
+      transform: translateY(-2px);
+    }
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .result {
+      background: #f0fdf4;
+      border: 2px solid #16A34A;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 24px;
+      display: none;
+    }
+    .result.show {
+      display: block;
+    }
+    .result-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #16A34A;
+      margin-bottom: 12px;
+    }
+    .result-stats {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    code {
+      background: rgba(102,126,234,0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Monaco', monospace;
+      font-size: 13px;
+      color: #667eea;
+    }
+    .highlight {
+      background: #fef3c7;
+      padding: 2px 4px;
+      border-radius: 3px;
+      font-weight: 600;
+    }
+    .warning {
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 20px 0;
+      color: #92400e;
+    }
+    .info {
+      background: #dbeafe;
+      border-left: 4px solid #3b82f6;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 20px 0;
+      color: #1e40af;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📧 邮件数据解析工具</h1>
+    <p class="subtitle">从 Gmail 邮件中提取并导出赛博名片用户数据</p>
+
+    <div class="info">
+      <strong>💡 使用说明：</strong><br>
+      此工具帮助你从 EmailJS 发送的邮件中批量提取用户数据，并导出为 Excel 表格。<br>
+      <strong>适用场景：</strong>用户数据通过 EmailJS 发送到你的邮箱 <code>yefangu@gmail.com</code>
+    </div>
+
+    <div class="step">
+      <div class="step-title">
+        <span class="step-number">1</span>
+        登录 Gmail 并搜索邮件
+      </div>
+      <div class="step-content">
+        • 登录 <a href="https://mail.google.com" target="_blank" style="color: #667eea;">Gmail</a><br>
+        • 搜索框输入：<code>赛博名片提交</code> 或 <code>from:service@emailjs.com</code><br>
+        • 找到所有用户提交的邮件
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-title">
+        <span class="step-number">2</span>
+        复制邮件内容
+      </div>
+      <div class="step-content">
+        <strong>方法 A：单个邮件</strong><br>
+        • 打开一封邮件<br>
+        • 全选邮件内容（Ctrl+A / Cmd+A）<br>
+        • 复制（Ctrl+C / Cmd+C）<br>
+        • 粘贴到下方文本框<br><br>
+        
+        <strong>方法 B：批量邮件（推荐）</strong><br>
+        • 选中多封邮件<br>
+        • 依次打开，复制每封邮件的内容<br>
+        • 将所有内容粘贴到下方文本框（可以连续粘贴）
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-title">
+        <span class="step-number">3</span>
+        粘贴并解析
+      </div>
+      <div class="step-content">
+        将复制的邮件内容粘贴到下方文本框：<br><br>
+        <textarea id="emailContent" class="textarea-box" placeholder="粘贴邮件内容到这里...
+
+支持粘贴多封邮件的内容，工具会自动识别和提取数据。
+
+示例格式：
+━━━━━━━━━━━━━━━━
+📋 业务调研信息
+AI 方向        大模型研发
+出海计划        是，出海是主线
+..."></textarea>
+        
+        <div class="actions">
+          <button class="btn btn-primary" onclick="parseEmails()">🔍 解析邮件数据</button>
+          <button class="btn btn-success" onclick="exportToCSV()" id="exportBtn" disabled>⬇ 导出为 Excel (CSV)</button>
+          <button class="btn btn-success" onclick="exportToJSON()" id="exportJsonBtn" disabled>📄 导出为 JSON</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="result" id="result">
+      <div class="result-title">✅ 解析成功！</div>
+      <div class="result-stats" id="resultStats"></div>
+    </div>
+
+    <div class="warning">
+      <strong>⚠️ 隐私提示：</strong><br>
+      所有数据解析均在您的浏览器本地完成，不会上传到任何服务器。<br>
+      请妥善保管导出的数据文件，避免泄露用户隐私信息。
+    </div>
+  </div>
+
+  <script>
+    let parsedData = [];
+
+    function parseEmails() {
+      const content = document.getElementById('emailContent').value;
+      
+      if (!content.trim()) {
+        alert('❌ 请先粘贴邮件内容');
+        return;
+      }
+
+      // 解析邮件数据
+      parsedData = [];
+      
+      // 分割多封邮件（通过分隔符）
+      const sections = content.split(/━{10,}/);
+      
+      sections.forEach(section => {
+        if (section.trim().length < 50) return; // 忽略太短的片段
+        
+        const data = {
+          submitTime: extractField(section, /提交时间[:\s]+(.+?)(?:\n|$)/),
+          realName: extractField(section, /(?:真实姓名|姓名)[:\s]+(.+?)(?:\n|$)/),
+          company: extractField(section, /(?:公司名称|公司)[:\s]+(.+?)(?:\n|$)/),
+          title: extractField(section, /职位[:\s]+(.+?)(?:\n|$)/),
+          phone: extractField(section, /(?:手机号|手机)[:\s]+(.+?)(?:\n|$)/),
+          wechat: extractField(section, /微信[:\s]+(.+?)(?:\n|$)/),
+          email: extractField(section, /邮箱[:\s]+(.+?)(?:\n|$)/),
+          aiDirection: extractField(section, /AI\s*方向[:\s]+(.+?)(?:\n|$)/),
+          isOversea: extractField(section, /出海计划[:\s]+(.+?)(?:\n|$)/),
+          overseaMarkets: extractField(section, /目标市场[:\s]+(.+?)(?:\n|$)/),
+          cloudNeed: extractField(section, /算力需求[:\s]+(.+?)(?:\n|$)/),
+          businessIntro: extractField(section, /业务介绍[:\s]+(.+?)(?:\n|$)/),
+          displayName: extractField(section, /(?:展示名称|显示名)[:\s]+(.+?)(?:\n|$)/),
+          titles: extractField(section, /职业身份[:\s]+(.+?)(?:\n|$)/),
+          organization: extractField(section, /所属机构[:\s]+(.+?)(?:\n|$)/),
+          bio: extractField(section, /个人简介[:\s]+(.+?)(?:\n|$)/),
+          skills: extractField(section, /技能标签[:\s]+(.+?)(?:\n|$)/),
+          templateId: extractField(section, /(?:选择模板|模板)[:\s]+(.+?)(?:\n|$)/)
+        };
+        
+        // 验证是否有足够的有效字段
+        const validFields = Object.values(data).filter(v => v && v !== '-').length;
+        if (validFields >= 5) {
+          parsedData.push(data);
+        }
+      });
+
+      if (parsedData.length === 0) {
+        alert('❌ 未能识别到有效数据，请检查邮件格式');
+        return;
+      }
+
+      // 显示结果
+      document.getElementById('result').classList.add('show');
+      document.getElementById('resultStats').innerHTML = `
+        <strong>共解析到 ${parsedData.length} 条用户数据</strong><br><br>
+        数据预览（前3条）：<br>
+        ${parsedData.slice(0, 3).map((d, i) => `
+          <div style="margin-top: 12px; padding: 12px; background: white; border-radius: 6px; font-size: 13px;">
+            <strong>${i + 1}. ${d.realName || '未知'}</strong> - ${d.company || '未知'} - ${d.title || '未知'}<br>
+            <span style="color: #999;">📞 ${d.phone || '-'} | ✉️ ${d.email || '-'}</span>
+          </div>
+        `).join('')}
+        ${parsedData.length > 3 ? `<div style="margin-top: 12px; color: #999;">...以及其他 ${parsedData.length - 3} 条数据</div>` : ''}
+      `;
+      
+      // 启用导出按钮
+      document.getElementById('exportBtn').disabled = false;
+      document.getElementById('exportJsonBtn').disabled = false;
+    }
+
+    function extractField(text, regex) {
+      const match = text.match(regex);
+      return match ? match[1].trim() : '';
+    }
+
+    function exportToCSV() {
+      if (parsedData.length === 0) {
+        alert('❌ 没有可导出的数据');
+        return;
+      }
+
+      const headers = [
+        '序号', '提交时间', '姓名', '公司', '职位', '手机', '微信', '邮箱', 
+        'AI方向', '出海计划', '目标市场', '算力需求', '业务介绍', 
+        '展示名称', '职业身份', '所属机构', '个人简介', '技能标签', '模板'
+      ];
+
+      const rows = parsedData.map((item, index) => [
+        index + 1,
+        item.submitTime || '',
+        item.realName || '',
+        item.company || '',
+        item.title || '',
+        item.phone || '',
+        item.wechat || '',
+        item.email || '',
+        item.aiDirection || '',
+        item.isOversea || '',
+        item.overseaMarkets || '',
+        item.cloudNeed || '',
+        item.businessIntro || '',
+        item.displayName || '',
+        item.titles || '',
+        item.organization || '',
+        item.bio || '',
+        item.skills || '',
+        item.templateId || ''
+      ]);
+
+      const csvContent = [headers, ...rows]
+        .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+        .join('\n');
+
+      const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+      downloadFile(blob, `赛博名片数据_${getDateString()}.csv`);
+      
+      alert(`✅ 成功导出 ${parsedData.length} 条数据到 CSV 文件\n\n可以用 Excel 或 WPS 打开`);
+    }
+
+    function exportToJSON() {
+      if (parsedData.length === 0) {
+        alert('❌ 没有可导出的数据');
+        return;
+      }
+
+      const jsonContent = JSON.stringify(parsedData, null, 2);
+      const blob = new Blob([jsonContent], { type: 'application/json;charset=utf-8;' });
+      downloadFile(blob, `赛博名片数据_${getDateString()}.json`);
+      
+      alert(`✅ 成功导出 ${parsedData.length} 条数据到 JSON 文件`);
+    }
+
+    function downloadFile(blob, filename) {
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function getDateString() {
+      const now = new Date();
+      return `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+    }
+  </script>
+</body>
+</html>
